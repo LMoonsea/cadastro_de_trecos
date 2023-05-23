@@ -6,7 +6,6 @@
 package com.lmoonsea.cadastro_de_trecos;
 
 import java.util.Scanner;
-import javax.swing.JOptionPane;
 /**
  *
  * @author 16128412023.1
@@ -21,7 +20,11 @@ public class Cadastro_de_trecos {
         Scanner scanner = new Scanner(System.in);
         String option = scanner.next();
         
-        String nome = JOptionPane.showInputDialog("Qual é o seu nome?");
+        if (option.length()!=1) {
+            
+            System.out.println("Bizonhou");
+        }
+ 
        
     }
     
