@@ -3,6 +3,7 @@ package com.lmoonsea.cadastro_de_trecos;
 import com.lmoonsea.cadastro_de_trecos.crud.Delete;
 import com.lmoonsea.cadastro_de_trecos.setup.AppSetup;
 import com.lmoonsea.cadastro_de_trecos.crud.Read;
+import com.lmoonsea.cadastro_de_trecos.crud.Search;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -50,6 +51,8 @@ public class Cadastro_de_trecos extends AppSetup {
                 clearScreen();
                 Delete.delete();
             }
+            case "6" ->
+                Search.search();
             default ->
                 reloadMenu();
         }
