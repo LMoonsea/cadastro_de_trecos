@@ -1,41 +1,38 @@
+
 package com.lmoonsea.cadastro_de_trecos.crud;
 
+import java.sql.SQLException;
 import com.lmoonsea.cadastro_de_trecos.setup.AppSetup;
 import com.lmoonsea.cadastro_de_trecos.db.DbConnection;
-import java.sql.SQLException;
 import static com.lmoonsea.cadastro_de_trecos.setup.AppSetup.*;
-import static com.lmoonsea.cadastro_de_trecos.Cadastro_de_trecos.*;
+import static com.lmoonsea.cadastro_de_trecos.Main.*;
+import static com.lmoonsea.cadastro_de_trecos.Tools.*;
 
 public class Read extends AppSetup {
 
     // Lista todos os registros.
     public static void readAll() {
 
+        // Reserva recursos.
+        String sql;
+
         // Cabeçalho da view.
         System.out.println(appName + "\n" + appSep);
         System.out.println("Lista todos os registros");
-        System.out.println(appSep);
+        System.out.println(appSep + "\n");
 
         try {
 
             // Consulta o banco de dados.
-            String sql = "SELECT * FROM " + DBTABLE;
+            sql = "SELECT *, DATE_FORMAT(data, '%d/%m/%Y às %H:%i') AS databr FROM " + DBTABLE + " WHERE status != '0' ORDER BY nome";
             conn = DbConnection.dbConnect();
             stmt = conn.createStatement();
             res = stmt.executeQuery(sql);
-
-            System.out.println(" ");
             if (res.next()) {
 
-                // Se encontrou registros.
+                // Se encontrou registros, exibe na view.
                 do {
-
-                    // Exibe registro na view.
-                    System.out.println(
-                            "ID: " + res.getString("id") + "\n"
-                            + "  Nome: " + res.getString("name") + "\n"
-                            + "  Descrição: " + res.getString("description") + "\n"
-                    );
+                    showRes(res);
                 } while (res.next());
             } else {
 
@@ -58,17 +55,17 @@ public class Read extends AppSetup {
 
             // Executa conforme a opção.
             switch (option) {
-                case "0" ->
+                case "0":
                     exitProgram();
-                case "1" -> {
+                    break;
+                case "1":
                     clearScreen();
                     mainMenu();
-                }
-                default -> {
+                    break;
+                default:
                     clearScreen();
                     System.out.println("Oooops! Opção inválida!\n");
                     readAll();
-                }
             }
 
         } catch (SQLException error) {
@@ -85,7 +82,7 @@ public class Read extends AppSetup {
 
         // Reserva recursos para o banco de dados.
         int id = 0;
-        String sql = "";
+        String sql;
 
         // Cabeçalho da seção.
         System.out.println(appName + "\n" + appSep);
@@ -111,8 +108,10 @@ public class Read extends AppSetup {
 
         try {
 
+            System.out.println(" ");
+
             // Faz consulta no banco de dados usando "preparedStatement".
-            sql = "SELECT * FROM " + DBTABLE + " WHERE id = ?";
+            sql = "SELECT *, DATE_FORMAT(data, '%d/%m/%Y às %H:%i') AS databr FROM " + DBTABLE + " WHERE status != '0' AND id = ?";
             conn = DbConnection.dbConnect();
             pstm = conn.prepareStatement(sql);
 
@@ -123,14 +122,7 @@ public class Read extends AppSetup {
             res = pstm.executeQuery();
 
             if (res.next()) {
-
-                // Se tem registro, exibe na view.
-                System.out.println(
-                        "\nID: " + res.getString("id") + "\n"
-                        + "  Nome: " + res.getString("name") + "\n"
-                        + "  "
-                        + "Descrição: " + res.getString("description") + "\n"
-                );
+                showRes(res);
             } else {
 
                 // Se não tem registro.
@@ -153,21 +145,21 @@ public class Read extends AppSetup {
 
             // Executa conforme a opção.
             switch (option) {
-                case "0" ->
+                case "0":
                     exitProgram();
-                case "1" -> {
+                    break;
+                case "1":
                     clearScreen();
                     mainMenu();
-                }
-                case "2" -> {
+                    break;
+                case "2":
                     clearScreen();
                     read();
-                }
-                default -> {
+                    break;
+                default:
                     clearScreen();
                     System.out.println("Oooops! Opção inválida!\n");
                     read();
-                }
             }
 
         } catch (SQLException error) {

@@ -3,13 +3,13 @@ package com.lmoonsea.cadastro_de_trecos.crud;
 
 import java.sql.SQLException;
 import static com.lmoonsea.cadastro_de_trecos.Main.*;
+import static com.lmoonsea.cadastro_de_trecos.Tools.*;
 import com.lmoonsea.cadastro_de_trecos.db.DbConnection;
 import com.lmoonsea.cadastro_de_trecos.setup.AppSetup;
-import static com.lmoonsea.cadastro_de_trecos.Tools.*;
 
-public class Delete extends AppSetup {
+public class ToggleStatus extends AppSetup {
 
-    public static void delete() {
+    public static void toggleStatus() {
 
         // Reserva recursos para o banco de dados.
         int id = 0;
@@ -17,7 +17,7 @@ public class Delete extends AppSetup {
 
         // Cabeçalho da seção.
         System.out.println(appName + "\n" + appSep);
-        System.out.println("Apaga um registro");
+        System.out.println("(Des)Bloqueia um registro");
         System.out.println(appSep);
 
         try {
@@ -34,15 +34,15 @@ public class Delete extends AppSetup {
             // Quando opção é inválida.
             clearScreen();
             System.out.println("Oooops! Opção inválida!\n");
-            delete();
+            toggleStatus();
         }
 
         try {
-            
+
             System.out.println(" ");
 
             // Verifica se o registro existe.
-            sql = "SELECT *, DATE_FORMAT(data, '%d/%m/%Y às %H:%i') AS databr FROM " + DBTABLE + " WHERE status = '2' AND id = ?";
+            sql = "SELECT *, DATE_FORMAT(data, '%d/%m/%Y às %H:%i') AS databr FROM " + DBTABLE + " WHERE status != '0' AND id = ?";
             conn = DbConnection.dbConnect();
             pstm = conn.prepareStatement(sql);
             pstm.setInt(1, id);
@@ -53,15 +53,29 @@ public class Delete extends AppSetup {
                 // Se encontrou o registro, exibe na view.
                 showRes(res);
 
-                System.out.print("Tem certeza que deseja apagar o registro? [s/N] ");
+                String newStatus;
+
+                if (res.getString("status").equals("1")) {
+                    newStatus = "2";
+                    System.out.print("Tem certeza que deseja ATIVAR o registro? [s/N] ");
+                } else {
+                    newStatus = "1";
+                    System.out.print("Tem certeza que deseja BLOQUEAR o registro? [s/N] ");
+                }
+
                 if (scanner.next().trim().toLowerCase().equals("s")) {
 
-                    sql = "UPDATE " + DBTABLE + " SET status = '0' WHERE status = '2' AND id = ?";
+                    sql = "UPDATE " + DBTABLE + " SET status = ? WHERE id = ?";
                     pstm = conn.prepareStatement(sql);
-                    pstm.setInt(1, id);
+                    pstm.setString(1, newStatus);
+                    pstm.setInt(2, id);
                     if (pstm.executeUpdate() == 1) {
                         // Registro apagado.
-                        System.out.println("\nRegistro apagado!");
+                        if (newStatus.equals("1")) {
+                            System.out.println("\nRegistro bloqueado!");
+                        } else {
+                            System.out.println("\nRegistro ativado!");
+                        }
                     } else {
                         System.out.println("Oooops! Algo deu errado!");
                     }
@@ -72,7 +86,7 @@ public class Delete extends AppSetup {
             } else {
                 clearScreen();
                 System.out.println("Oooops! Não achei nada!\n");
-                delete();
+                toggleStatus();
             }
 
             // Fecha banco de dados.
@@ -80,7 +94,7 @@ public class Delete extends AppSetup {
 
             // Menu inferior da seção.
             System.out.println(appSep);
-            System.out.println("Menu:\n\t[1] Menu principal\n\t[2] Apagar outro\n\t[0] Sair");
+            System.out.println("Menu:\n\t[1] Menu principal\n\t[2] (Des)Bloquear outro\n\t[0] Sair");
             System.out.println(appSep);
 
             // Recebe opção do teclado.            
@@ -97,12 +111,12 @@ public class Delete extends AppSetup {
                 }
                 case "2" -> {
                     clearScreen();
-                    delete();
+                    toggleStatus();
                 }
                 default -> {
                     clearScreen();
                     System.out.println("Oooops! Opção inválida!\n");
-                    delete();
+                    toggleStatus();
                 }
             }
 

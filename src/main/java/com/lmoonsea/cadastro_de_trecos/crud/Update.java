@@ -3,9 +3,10 @@ package com.lmoonsea.cadastro_de_trecos.crud;
 
 import java.sql.SQLException;
 import java.util.Scanner;
-import static com.lmoonsea.cadastro_de_trecos.Cadastro_de_trecos.*;
+import static com.lmoonsea.cadastro_de_trecos.Main.*;
 import com.lmoonsea.cadastro_de_trecos.db.DbConnection;
 import com.lmoonsea.cadastro_de_trecos.setup.AppSetup;
+import static com.lmoonsea.cadastro_de_trecos.Tools.*;
 
 public class Update extends AppSetup {
 
@@ -39,8 +40,10 @@ public class Update extends AppSetup {
 
         try {
 
+            System.out.println(" ");
+
             // Obtém o registro solicitado do banco de dados.
-            sql = "SELECT * FROM " + DBTABLE + " WHERE id = ?";
+            sql = "SELECT *, DATE_FORMAT(data, '%d/%m/%Y às %H:%i') AS databr FROM " + DBTABLE + " WHERE status = '2' AND id = ?";
             conn = DbConnection.dbConnect();
             pstm = conn.prepareStatement(sql);
             pstm.setInt(1, id);
@@ -48,11 +51,7 @@ public class Update extends AppSetup {
             if (res.next()) {
 
                 // Se tem registro, exibe na view.
-                System.out.println(
-                        "\nID: " + res.getString("id") + "\n"
-                        + "  Nome: " + res.getString("name") + "\n"
-                        + "  Descrição: " + res.getString("description") + "\n"
-                );
+                showRes(res);
 
                 System.out.println("Insira os novos dados ou deixe em branco para manter os atuais:\n");
 
@@ -62,23 +61,28 @@ public class Update extends AppSetup {
                 System.out.print("\tNome: ");
                 String itemName = keyboard.nextLine().trim();
 
-                System.out.print("\tDescription: ");
+                System.out.print("\tDescrição: ");
                 String itemDescription = keyboard.nextLine().trim();
+
+                System.out.print("\tLocalização: ");
+                String itemLocation = keyboard.nextLine().trim();
 
                 // Pede confirmação.
                 System.out.print("\nOs dados acima estão corretos? [s/N] ");
                 if (keyboard.next().trim().toLowerCase().equals("s")) {
 
-                    // Short Hand → https://www.w3schools.com/java/java_conditions_shorthand.asp
-                    String saveName = (itemName.equals("")) ? res.getString("name") : itemName;
-                    String saveDescription = (itemDescription.equals("")) ? res.getString("description") : itemDescription;
+                    // Se não preencheu, sa valores orignais.
+                    String saveName = (itemName.equals("")) ? res.getString("nome") : itemName;
+                    String saveDescription = (itemDescription.equals("")) ? res.getString("descricao") : itemDescription;
+                    String saveLocation = (itemLocation.equals("")) ? res.getString("localizacao") : itemLocation;
 
                     // Atualiza registro no banco de dados.
-                    sql = "UPDATE " + DBTABLE + " SET name = ?, description = ? WHERE id = ?";
+                    sql = "UPDATE " + DBTABLE + " SET nome = ?, descricao = ?, localizacao = ? WHERE status = '2' AND id = ?";
                     pstm = conn.prepareStatement(sql);
                     pstm.setString(1, saveName);
                     pstm.setString(2, saveDescription);
-                    pstm.setInt(3, id);
+                    pstm.setString(3, saveLocation);
+                    pstm.setInt(4, id);
                     if (pstm.executeUpdate() == 1) {
 
                         // Se o registro foi criado.

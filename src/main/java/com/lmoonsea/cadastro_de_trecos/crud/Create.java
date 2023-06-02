@@ -1,10 +1,10 @@
 
 package com.lmoonsea.cadastro_de_trecos.crud;
 
-
 import java.sql.SQLException;
 import java.util.Scanner;
-import static com.lmoonsea.cadastro_de_trecos.Cadastro_de_trecos.*;
+import static com.lmoonsea.cadastro_de_trecos.Main.*;
+import static com.lmoonsea.cadastro_de_trecos.Tools.*;
 import com.lmoonsea.cadastro_de_trecos.db.DbConnection;
 import com.lmoonsea.cadastro_de_trecos.setup.AppSetup;
 
@@ -33,16 +33,21 @@ public class Create extends AppSetup {
             System.out.print("\tDescrição: ");
             String itemDescription = keyboard.nextLine().trim();
 
+            // Obtém a descrição.
+            System.out.print("\tLocalização: ");
+            String itemLocation = keyboard.nextLine().trim();
+
             // Pede confirmação.
             System.out.print("\nOs dados acima estão corretos? [s/N] ");
             if (keyboard.next().trim().toLowerCase().equals("s")) {
 
                 // Insere os dados na tabela usando PreparetedStatement.
-                sql = "INSERT INTO " + DBTABLE + " (name, description) VALUES (?, ?)";
+                sql = "INSERT INTO " + DBTABLE + " (nome, descricao, localizacao) VALUES (?, ?, ?)";
                 conn = DbConnection.dbConnect();
                 pstm = conn.prepareStatement(sql);
                 pstm.setString(1, itemName);
                 pstm.setString(2, itemDescription);
+                pstm.setString(3, itemLocation);
 
                 if (pstm.executeUpdate() == 1) {
 
